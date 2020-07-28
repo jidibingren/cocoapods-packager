@@ -227,7 +227,7 @@ module Pod
         command.run
 
         lib = Dir.glob("NikeKit-*/ios/NikeKit.framework/NikeKit").first
-        `lipo #{lib} -verify_arch x86_64 i386 armv7 armv7s arm64`
+        `lipo #{lib} -verify_arch x86_64 arm64`
         $?.success?.should == true
       end
 
@@ -238,7 +238,7 @@ module Pod
         command.run
 
         lib = Dir.glob("NikeKit-*/ios/NikeKit.framework/NikeKit").first
-        `lipo #{lib} -verify_arch armv7 armv7s arm64`
+        `lipo #{lib} -verify_arch arm64`
         $?.success?.should == true
       end
 

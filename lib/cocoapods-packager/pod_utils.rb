@@ -12,6 +12,17 @@ module Pod
         Sandbox.new(static_sandbox_root)
       end
 
+      def get_config(key)
+        value = nil
+        if @spec.instance_variable_get(:@attributes_hash).is_a?Hash
+          pod_target_xcconfig = @spec.attributes_hash['pod_target_xcconfig']
+          if pod_target_xcconfig.is_a?Hash
+            value = pod_target_xcconfig[key]
+          end
+        end
+        return value
+      end
+
       def install_pod(platform_name, sandbox)
         podfile = podfile_from_spec(
           File.basename(@path),
@@ -26,10 +37,23 @@ module Pod
         static_installer.install!
 
         unless static_installer.nil?
+          # static_installer.pods_project.root_object.build_configuration_list.build_configurations.each do |config|
+          #   if config.build_settings['VALID_ARCHS'].nil?
+          #     config.build_settings['VALID_ARCHS'] = 'x86_64'
+          #   end
+          # end
           static_installer.pods_project.targets.each do |target|
             target.build_configurations.each do |config|
               config.build_settings['CLANG_MODULES_AUTOLINK'] = 'NO'
-              config.build_settings['GCC_GENERATE_DEBUGGING_SYMBOLS'] = 'NO'
+              if target.display_name.eql? @spec.name
+                if config.build_settings['GCC_GENERATE_DEBUGGING_SYMBOLS'].nil? and get_config('GCC_GENERATE_DEBUGGING_SYMBOLS').nil?
+                  config.build_settings['GCC_GENERATE_DEBUGGING_SYMBOLS'] = 'YES'
+                else
+                  puts "GCC_GENERATE_DEBUGGING_SYMBOLS already set:#{config.build_settings['GCC_GENERATE_DEBUGGING_SYMBOLS']}"
+                end
+              else
+                config.build_settings['GCC_GENERATE_DEBUGGING_SYMBOLS'] = 'NO'
+              end
             end
           end
           static_installer.pods_project.save

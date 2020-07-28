@@ -125,7 +125,7 @@ module Pod
 
     def build_sim_libraries(platform, defines)
       if platform.name == :ios
-        xcodebuild(defines, '-sdk iphonesimulator', 'build-sim')
+        xcodebuild(defines, "ARCHS=\'x86_64\' -sdk iphonesimulator", 'build-sim')
       end
     end
 
@@ -272,7 +272,7 @@ MAP
     end
 
     def ios_build_options
-      "ARCHS=\'x86_64 i386 arm64 armv7 armv7s\' OTHER_CFLAGS=\'-fembed-bitcode -Qunused-arguments\'"
+      "ARCHS=\'x86_64 arm64\' OTHER_CFLAGS=\'-fembed-bitcode -Qunused-arguments\'"
     end
 
     def xcodebuild(defines = '', args = '', build_dir = 'build', target = 'Pods-packager', project_root = @static_sandbox_root, config = @config)

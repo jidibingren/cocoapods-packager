@@ -123,8 +123,9 @@ module Pod
         target_dir = create_target_directory
         return if target_dir.nil?
 
-        work_dir = Dir.tmpdir + '/cocoapods-' + Array.new(8) { rand(36).to_s(36) }.join
-        Pathname.new(work_dir).mkdir
+        work_dir = Pod::Config.new.home_dir.to_s + '/Pods/' + @spec.name + '-' + @spec.version.to_s
+        FileUtils.rm_rf(work_dir)
+        FileUtils.mkdir_p work_dir
         `cp #{@path} #{work_dir}`
         Dir.chdir(work_dir)
 
